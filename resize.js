@@ -12,15 +12,16 @@ function resize_file(file, maxSize, callback){
     var reader = new FileReader();
     //test for filetype
     if (!/image\/(jpeg|jpg|png|gif)/.test(file.type)) {
-        alert('File type "'+ file.type +'" is not supported.');
-        return false;
+        /*alert('File type "'+ file.type +'" is not supported.');*/
+        callback("ERR");
     }
     reader.onload = function (e) {
         // resize readed image
         resize_dataUrl(e.target.result, maxSize, callback);
     }
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file);    
 }
+
 function resize_dataUrl(dataURL, maxSize, callback){
     var image = new Image();
     image.onload = function (imageEvent) {

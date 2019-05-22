@@ -40,9 +40,29 @@ div.dropzone {
     margin:         10px;
 }
 
+table {
+    border-spacing:		0;
+}
+
+tr {
+    transition: all .5s ease-out;
+	-webkit-transition: all .5s ease-out;
+}
+
+tr.rowSelected {
+    background-color:     lightgreen !important;
+}
+
+tr.enHover:hover {
+    background-color:     lightgreen !important;
+}
+
 td {
-    border-right:    1px dotted gray;
-    border-bottom:    1px dotted gray;
+    margin:         0px;
+    padding-left:   5px;
+    padding-right:   5px;
+    border-right:   1px dotted gray;
+    border-bottom:  1px dotted gray;
 }
 
 input, select {
