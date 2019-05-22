@@ -73,16 +73,28 @@ function generate() {
     SubTitleHeight = parseInt(document.getElementById("SubTitleHeight").value, 10);
     AspectRatio = parseInt(document.getElementById("AspectRatio").value, 10) / 1000.0;
     ImgScale = 1; /*parseInt(document.getElementById("Scale").value, 10) / 100;*/
-    RotRange = [-parseInt(document.getElementById("Rotation").value, 10), parseInt(document.getElementById("Rotation").value, 10)];
+    RotRange = [-parseInt(document.getElementById("Rotation").value, 10), parseInt(document.getElementById("Rotation").value, 10)];    
+    BackgroundColor = document.getElementById("BGColor").value;
+    ImgBackColor = document.getElementById("ImgBgColor").value;
+    TextColor = document.getElementById("StTxtColor").value;
     
     /* preview insertion */
     document.getElementById("svgbox").innerHTML = svgGenerator(true);
 
+    let obj;
+    let file;
+    
     /* download button with full svg */
-    let obj = document.getElementById("savesvg");
-    let file = new Blob([svgGenerator(false)], {type: "text/plain"});
+    obj = document.getElementById("savesvg");
+    file = new Blob([svgGenerator(false)], {type: "text/plain"});
     obj.href = URL.createObjectURL(file);
     obj.download = "collage.svg";
+    
+    /* download button to download project */
+    obj = document.getElementById("saveprj");
+    file = new Blob([makeJSONObj()], {type: "text/plain"});
+    obj.href = URL.createObjectURL(file);
+    obj.download = "collagePrj.collage";
 }
 
 function svgGenerator(preview) {
@@ -164,10 +176,6 @@ function svgGenerator(preview) {
 
 /* set colors from selection */
 function setColors() {
-    BackgroundColor = document.getElementById("BGColor").value;
-    ImgBackColor = document.getElementById("ImgBgColor").value;
-    TextColor = document.getElementById("StTxtColor").value;
-    
     generate();
 }
 
@@ -225,7 +233,7 @@ function generateImgListEditor() {
         if (i == Selection) {
             rClass = "rowSelected";
         }
-        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover'><td>" + (i + 1) +  ".</td>";
+        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover' id='editorRow" + i + "'><td>" + (i + 1) +  ".</td>";
         html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
 		if (!Images[i].Processing && !Images[i].Error) {
             if (Images[i].Visible) {
@@ -248,16 +256,19 @@ function generateImgListEditor() {
 
 		document.getElementById("imagelisteditor").innerHTML += html;
     }
-
-    makeJSONObj();
+    
     generate();
 }
 
 /* image list editor - select */
 function selImage(nr, sender) {   
-    Selection = parseInt(nr, 10);
+    if (Selection > -1 && Selection < Images.length) {
+        document.getElementById("editorRow" + Selection).classList.toggle("rowSelected");    
+    }
+    Selection = parseInt(nr, 10);    
+    document.getElementById("editorRow" + Selection).classList.toggle("rowSelected");
     
-    generateImgListEditor();
+    generate();
 }
 
 
@@ -420,11 +431,7 @@ function makeJSONObj() {
         jsonObj.push(iObj);
     }
     
-    /* download button to save project */
-    let obj = document.getElementById("saveprj");
-    let file = new Blob([JSON.stringify(jsonObj)], {type: "text/plain"});
-    obj.href = URL.createObjectURL(file);
-    obj.download = "collagePrj.json";
+    return JSON.stringify(jsonObj);
 }
 
 /* load Project from JSON file */
@@ -450,7 +457,7 @@ function loadPrj(e) {
 function interpretPrj(str) {
     let jsonObj = JSON.parse(str);
     
-    console.log(jsonObj[0].collageWidth);
+    Images = [];
     
     /* Parameters */
     document.getElementById("collageWidth").value = jsonObj[0].collageWidth;
@@ -460,16 +467,23 @@ function interpretPrj(str) {
     document.getElementById("XMargin").value = jsonObj[0].XMargin;
     document.getElementById("YMargin").value = jsonObj[0].YMargin;
     document.getElementById("SubTitleHeight").value = jsonObj[0].SubTitleHeight;
-    document.getElementById("AspectRatio").value = jsonObj[0].AspectRatio * 1000;
-    console.log(jsonObj[0].AspectRatio);
+    document.getElementById("AspectRatio").value = jsonObj[0].AspectRatio * 1000;    
     ImgScale = 1; /*parseInt(document.getElementById("Scale").value, 10) / 100;*/
     document.getElementById("Rotation").value = parseInt(jsonObj[0].RotRange, 10);
     document.getElementById("BGColor").value = jsonObj[0].BackgroundColor;
     document.getElementById("ImgBgColor").value = jsonObj[0].ImgBackColor;
     document.getElementById("StTxtColor").value = jsonObj[0].TextColor;
     
-    console.log(jsonObj[0].BackgroundColor);
+    for (let i = 1; i < jsonObj.length; i++) {
+        Images.push(new CollageImage(null, jsonObj[i].FileName, jsonObj[i].SubTitle, jsonObj[i].Visible));
+        Images[i-1].Preview = jsonObj[i].Preview;
+        Images[i-1].XSpan = jsonObj[i].XSpan;
+        Images[i-1].YSpan = jsonObj[i].YSpan;
+        Images[i-1].Error = jsonObj[i].Error;
+        Images[i-1].Processing = false;        
+    }
     
+    generateImgListEditor();
 }
 
 

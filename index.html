@@ -6,9 +6,9 @@
         <div class="box"><h1>Collage</h1></div>
         <div class="box">
             <h2>Projekt:</h2> 
-            Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile"/><br><br>
-            <a href="" id="savesvg">SVG speichern</a> - Das SVG muss sich zur weiteren Verarbeitung im selben Verzeichnis wie die Bilder befinden!<br>
-            <a href="" id="saveprj">Projekt speichern</a> - Das Projekt später fortsetzen.
+            Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile" accept=".collage"/><br><br>
+            <a href="" id="savesvg" download>SVG speichern</a> - Das SVG muss sich zur weiteren Verarbeitung im selben Verzeichnis wie die Bilder befinden!<br>
+            <a href="" id="saveprj" download>Projekt speichern</a> - Das Projekt für später speichern.
         </div>
         <div class="box" id="parameters">
             <h2>Parameter:</h2>
@@ -67,7 +67,7 @@
         </div>        
         <div class="box">
             <h2>Bilder:</h2> 
-            Bilder hierher ziehen:
+            Bilder hier ablegen:
             <div class="dropzone" id="dropzone">
             </div>
             <button type="button" onClick="addPlaceHolder()"><span>Platzhalter einfügen</span></button>
