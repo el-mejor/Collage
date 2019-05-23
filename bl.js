@@ -1,5 +1,6 @@
 ﻿"use strict";
 
+var keyControllArmed = false;
 var collageWidth = 1000;
 var collageHeight = 1000;
 var columns = 3;
@@ -37,6 +38,9 @@ class CollageImage {
 /* initialize ui */
 function initUI() {
     let obj;
+    
+    document.addEventListener("keydown",keyPush);
+    document.addEventListener("mousedown",function() {keyControllArmed = false;});
     
     obj = document.getElementsByClassName("colorSelect");
     for (let i = 0; i < obj.length; i++)
@@ -162,7 +166,7 @@ function svgGenerator(preview) {
                 
                 if (Selection == iimg && preview) {
                     
-                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:none;stroke:blue;stroke-width:3px;stroke-dasharray:15,15'/>";
+                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:none;stroke:lime;stroke-width:3px;stroke-dasharray:15,15'/>";
                 }
 
                 iimg++;
@@ -196,8 +200,23 @@ function setImgPreview(cImg) {
 
 /*add placeholder */
 function addPlaceHolder() {
-    Images.push(new CollageImage(null, "frei", "", false));    
     
+    let i = Images.length - 1;
+    if (Selection > -1) {
+        i = Selection;
+        
+        if (i >= Images.length) {
+            i = Images.length - 1;
+        }
+    }
+    
+    if (i < 0) {
+        i = 0;
+    }
+    
+    console.log(i);
+    Images.splice(i, 0, new CollageImage(null, "frei", "", false));    
+        
     generateImgListEditor();
 }
 
@@ -255,6 +274,7 @@ function generateImgListEditor() {
         html += "</tr>";            
 
 		document.getElementById("imagelisteditor").innerHTML += html;
+        
     }
     
     generate();
@@ -268,9 +288,36 @@ function selImage(nr, sender) {
     Selection = parseInt(nr, 10);    
     document.getElementById("editorRow" + Selection).classList.toggle("rowSelected");
     
+    keyControllArmed = true;
+    
     generate();
 }
 
+/* user key controll events */
+function keyPush(evt) {
+    return; /* disabled - prevent controlling by keys if the keys are needed from another controll... */
+    if (!keyControllArmed) {
+        return;
+    }
+    
+    switch(evt.keyCode) {
+        case 37:
+            upImage("Gen");
+            break;
+        case 38:
+            upImage("Gen");
+            break;
+        case 39:
+            downImage("Gen");
+            break;
+        case 40:
+            downImage("Gen");
+            break;
+        case 46:
+            delImage("Gen");
+            break;
+	}
+}
 
 /* image list editor - delete */
 function delImage(nr) {   

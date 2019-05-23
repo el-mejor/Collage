@@ -5,23 +5,69 @@
 }
 
 body {	
-	background:		#FFFFFF;	
-	padding:		10px;	    
-}
-
-h1 {
-    font-size:      3em;
-    font-weight:    bold;
+	background:     dimgray;	
     margin:         0;
-}
-
-div.box {
-    margin:         10px;
-    background:     #EEEEEE;
-    padding:        10px;    
-    border-radius:  4px;    
     
 }
+
+div.header {    
+    display:        flex;
+    min-height:     64px;        
+    justify-content: space-between;
+    align-items:    flex-start;    
+    top: 0;
+    margin:         0px !important;
+    margin-bottom:  20px !important;
+    background:     white !important;    
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    
+     
+    -webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+}
+
+div.projectbox {    
+    background:     gold !important;
+    max-width:      30vw;
+    float:          right;
+    margin:         10px !important;    
+    
+}
+
+div.workspace {
+    display:        flex;
+    flex-wrap:      wrap;    
+    
+}
+
+img.titleImg {    
+    margin-right:   10;    
+}
+
+div.title {
+    display:        flex;
+    min-height:     64px;    
+    align-items:    center;
+    margin:         auto;        
+}
+
+span.title {    
+    font-size:      3em;
+    font-weight:    bold;    
+}
+
+div.box {               
+    margin:         4px;
+    background:     whitesmoke;
+    padding:        10px;    
+    border-radius:  4px;        
+    -webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+}
+
 
 div.svgbox {
     margin:         10px;
@@ -38,6 +84,13 @@ div.dropzone {
     border-radius:  5px;
     padding:        10px;
     margin:         10px;
+}
+
+h2 {
+    margin:         0px;
+    margin-bottom:  10px;    
+    font-size:      1.3em;
+    border-bottom:  1px solid dimgray;
 }
 
 table {
@@ -61,8 +114,8 @@ td {
     margin:         0px;
     padding-left:   5px;
     padding-right:   5px;
-    border-right:   1px dotted gray;
-    border-bottom:  1px dotted gray;
+    border-right:   1px dotted lightgray;
+    border-bottom:  1px dotted lightgray;
 }
 
 input, select {
