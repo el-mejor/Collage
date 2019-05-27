@@ -10,6 +10,29 @@ body {
     
 }
 
+div.hidden {
+    display:        none !important;
+}
+
+div.exportBox {    
+    position:       absolute;
+    top:            0;
+    left:           0;
+    width:          100vw;
+    height:         100vw;
+    margin:         0 auto;    
+    background:     black;
+    opacity:        0.8;
+}
+
+span.exportState {
+    display:        inline-block;
+    text-align:     center;
+    margin:         200;
+    font-size:      6em;
+    color:          white;
+}
+
 div.header {    
     display:        flex;
     min-height:     64px;        

@@ -18,6 +18,7 @@ var Selection = -1;
 var HtmlColorNames = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGrey","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","Darkorange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkSlateGrey","DarkTurquoise","DarkViolet","DeepPink","DeepSkyBlue","DimGray","DimGrey","DodgerBlue","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Grey","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGray","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateGray","LightSlateGrey","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
 
 var Images = [];
+var FullImages = [];
 class CollageImage {     
     constructor(file, filename, subtitle, visible) {     
         this.File = file;
@@ -31,6 +32,8 @@ class CollageImage {
         }
         this.Processing = visible;
         this.Error = false;
+        this.FullImg;
+        this.FullImgProcessing = false;
     }
 }
 
@@ -64,6 +67,7 @@ function initUI() {
     }
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);
+    document.getElementById("savepng").addEventListener("click", processPNG);    
     
     window.onbeforeunload = function() {
         return "Beim verlassen der Seite gehen ungespeicherte Projektdaten verloren. Seite jetzt wirklich verlassen?";
@@ -71,6 +75,9 @@ function initUI() {
 }
 
 function generate() {
+    let obj;
+    let file;
+    
     /* Parameters */
     collageWidth = parseInt(document.getElementById("collageWidth").value, 10);
     collageHeight = parseInt(document.getElementById("collageHeight").value, 10);
@@ -87,14 +94,11 @@ function generate() {
     TextColor = document.getElementById("StTxtColor").value;
     
     /* preview insertion */
-    document.getElementById("svgbox").innerHTML = svgGenerator(true);
+    document.getElementById("svgbox").innerHTML = svgGenerator(true, Images, false);
 
-    let obj;
-    let file;
-    
     /* download button with full svg */
     obj = document.getElementById("savesvg");
-    file = new Blob([svgGenerator(false)], {type: "text/plain"});
+    file = new Blob([svgGenerator(false, Images, false)], {type: "text/plain"});
     obj.href = URL.createObjectURL(file);
     obj.download = "collage.svg";
     
@@ -105,7 +109,65 @@ function generate() {
     obj.download = "collagePrj.collage";
 }
 
-function svgGenerator(preview) {
+function processPNG() {
+    document.getElementById("exportbox").classList.toggle("hidden");
+    document.getElementById("exportState").innerHTML = "Export läuft - bitte warten... 0 %";
+    FullImages = Images.slice();
+    for (let i = 0; i < FullImages.length; i++) {
+        setFullImageData(FullImages[i], 1024);
+    }
+}
+
+function exportPNG() {
+    let procImgs = 0;
+    for (let i = 0; i < FullImages.length; i++) {
+        if (FullImages[i].FullImgProcessing) {
+            procImgs ++;
+        }
+    }
+    
+    let percProc = Math.ceil((FullImages.length - procImgs) / FullImages.length * 100);
+    
+    document.getElementById("exportState").innerHTML = "Export läuft - bitte warten..." + percProc + " %";
+    if (procImgs > 0) {
+        return;
+    }
+    
+    let obj;
+    let file;
+    
+    /* test direct jpg dl */
+    let cvas = document.createElement('canvas');
+    cvas.setAttribute("id", "cvas");
+    cvas.setAttribute("width", collageWidth);
+    cvas.setAttribute("height", collageHeight);
+    document.getElementById('canvasbox').innerHTML = "";
+    document.getElementById('canvasbox').appendChild(cvas);
+    
+    
+    var svgImg = new Image();
+    svgImg.onload= function() {     
+        let cvas = document.getElementById('cvas');        
+        if (cvas) {            
+            cvas.getContext("2d").drawImage(svgImg, 0, 0);        
+            
+            cvas.toBlob(function(blob) {                
+                /* download button with png */
+                obj = document.getElementById("savepnglink");
+                obj.href = URL.createObjectURL(blob);
+                obj.download = "collage.png";                
+                obj.innerHTML = "Bild speichern";
+                
+                document.getElementById("exportState").innerHTML = "PNG Export: Fertig!";
+                document.getElementById("exportbox").classList.toggle("hidden");
+            });                
+        }
+    }
+    
+    svgImg.src = 'data:image/svg+xml;base64,' + btoa(svgGenerator(false, FullImages, true));    
+}
+
+function svgGenerator(preview, imgCollection, fullRes) {
     /* set adhoc parameters for scaling (preview) */
     let cWidth = collageWidth;
     let cHeight = collageHeight;
@@ -139,9 +201,9 @@ function svgGenerator(preview) {
     
     for (let y = 0; y < ypos.length; y += 2) {
         for (let x = 0; x < xpos.length; x += 2) {
-            if (iimg < Images.length) {
-                eW = Math.round(xpos[x + 1]) * Images[iimg].XSpan + (2 * iXMargin) * (Images[iimg].XSpan - 1);
-                eH = Math.round(ypos[y + 1]) * Images[iimg].YSpan + (2 * iYMargin) * (Images[iimg].YSpan - 1) + (SubTitleHeight) * (Images[iimg].YSpan - 1);
+            if (iimg < imgCollection.length) {
+                eW = Math.round(xpos[x + 1]) * imgCollection[iimg].XSpan + (2 * iXMargin) * (imgCollection[iimg].XSpan - 1);
+                eH = Math.round(ypos[y + 1]) * imgCollection[iimg].YSpan + (2 * iYMargin) * (imgCollection[iimg].YSpan - 1) + (SubTitleHeight) * (imgCollection[iimg].YSpan - 1);
 
                 eX = Math.round(-xpos[x + 1] / 2);
                 eY = Math.round(-ypos[y + 1] / 2);
@@ -150,13 +212,17 @@ function svgGenerator(preview) {
                 eTransY = Math.round(ypos[y] + ypos[y + 1] / 2);
                 eRot = Math.round(getRndInteger(RotRange[0], RotRange[1]));
 
-                if (iimg < Images.length && Images[iimg].Visible && !Images[iimg].Error) {      
-                    let iFile = Images[iimg].FileName;
+                if (iimg < imgCollection.length && imgCollection[iimg].Visible && !imgCollection[iimg].Error) {      
+                    let iFile = imgCollection[iimg].FileName;
                     let cHandler = ""; 
                     
                     if (preview) {
-                        iFile = Images[iimg].Preview;                        
+                        iFile = imgCollection[iimg].Preview;                        
                         cHandler = "onClick=\"selImage('" + iimg + "', this)\"";
+                    }
+                    
+                    if (fullRes) {
+                        iFile = imgCollection[iimg].FullImg;
                     }
                     
                     ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:" + ImgBackColor + ";'/>";
@@ -164,7 +230,7 @@ function svgGenerator(preview) {
                     ret += "<image xlink:href='" + iFile + "' x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + eH + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ") scale(" + ImgScale + ")' preserveAspectRatio='xMidYMid slice' " + cHandler + "/>";
                     
                     if (SubTitleHeight > 0) {
-                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + 15) + "px' alignment-baseline='middle' text-anchor='left' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan style='fill:" + TextColor + ";font-size:15px'>" + Images[iimg].SubTitle + "</tspan></text>";                
+                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + 15) + "px' alignment-baseline='middle' text-anchor='left' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan style='fill:" + TextColor + ";font-size:15px'>" + imgCollection[iimg].SubTitle + "</tspan></text>";                
                     }
                 }
                 
@@ -188,9 +254,9 @@ function setColors() {
 }
 
 /* generate image preview and callback generator */
-function setImgPreview(cImg) {
+function setImgPreview(cImg, res) {
     if (cImg.File) {
-        resize_file(cImg.File, 400, function (resizedDataUrl) { 
+        resize_file(cImg.File, res, function (resizedDataUrl) { 
             cImg.Preview = resizedDataUrl; 
             cImg.Processing = false; 
             if (resizedDataUrl == "ERR") {
@@ -201,6 +267,20 @@ function setImgPreview(cImg) {
     }
 }
 
+/* generate full images for export and callback exporter */
+function setFullImageData(cImg, res) {
+    cImg.FullImgProcessing = true;
+    if (cImg.File) {
+        resize_file(cImg.File, res, function (resizedDataUrl) { 
+            cImg.FullImg = resizedDataUrl; 
+            cImg.FullImgProcessing = false; 
+            if (resizedDataUrl == "ERR") {
+                cImg.Error = true;
+            }
+            exportPNG(); 
+        });            
+    }
+}
 
 /*add placeholder */
 function addPlaceHolder() {
@@ -218,7 +298,6 @@ function addPlaceHolder() {
         i = 0;
     }
     
-    console.log(i);
     Images.splice(i, 0, new CollageImage(null, "frei", "", false));    
         
     generateImgListEditor();
@@ -242,7 +321,7 @@ function dropImages(e) {
         let cImg = new CollageImage(e.dataTransfer.files[i], fName, fName, true);
         Images.push(cImg);        
         
-        setImgPreview(cImg);
+        setImgPreview(cImg, 400);
     }
     
     generateImgListEditor();
