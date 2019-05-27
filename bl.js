@@ -114,13 +114,16 @@ function processPNG() {
     document.getElementById("exportState").innerHTML = "Export läuft - bitte warten... 0 %";
     FullImages = Images.slice();
     for (let i = 0; i < FullImages.length; i++) {
+        FullImages[i].FullImgProcessing = true;     
+    }
+    for (let i = 0; i < FullImages.length; i++) {
         setFullImageData(FullImages[i], 1024);
     }
 }
 
 function exportPNG() {
     let procImgs = 0;
-    for (let i = 0; i < FullImages.length; i++) {
+    for (let i = 0; i < FullImages.length; i++) {        
         if (FullImages[i].FullImgProcessing) {
             procImgs ++;
         }
@@ -130,6 +133,7 @@ function exportPNG() {
     
     document.getElementById("exportState").innerHTML = "Export läuft - bitte warten..." + percProc + " %";
     if (procImgs > 0) {
+        console.log("still remaining processes! Remaining:" + procImgs);
         return;
     }
     
@@ -269,8 +273,7 @@ function setImgPreview(cImg, res) {
 
 /* generate full images for export and callback exporter */
 function setFullImageData(cImg, res) {
-    cImg.FullImgProcessing = true;
-    if (cImg.File) {
+    if (cImg.File && cImg.Visible) {
         resize_file(cImg.File, res, function (resizedDataUrl) { 
             cImg.FullImg = resizedDataUrl; 
             cImg.FullImgProcessing = false; 
@@ -279,6 +282,10 @@ function setFullImageData(cImg, res) {
             }
             exportPNG(); 
         });            
+    } else {
+        cImg.FullImgProcessing = false; 
+        console.log("The file obj is null :-(");
+        exportPNG(); 
     }
 }
 
