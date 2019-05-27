@@ -17,8 +17,8 @@ var TextColor = "white";
 var Selection = -1;
 var HtmlColorNames = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGrey","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","Darkorange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkSlateGrey","DarkTurquoise","DarkViolet","DeepPink","DeepSkyBlue","DimGray","DimGrey","DodgerBlue","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Grey","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGray","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateGray","LightSlateGrey","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
 
+var procImgs = -1;
 var Images = [];
-var FullImages = [];
 class CollageImage {     
     constructor(file, filename, subtitle, visible) {     
         this.File = file;
@@ -33,7 +33,7 @@ class CollageImage {
         this.Processing = visible;
         this.Error = false;
         this.FullImg;
-        this.FullImgProcessing = false;
+        this.FullImgProcessing = visible;
     }
 }
 
@@ -66,8 +66,7 @@ function initUI() {
         obj[i].addEventListener("mouseup", generate);		
     }
     
-    document.getElementById("collagePrjFile").addEventListener("change", loadPrj);
-    document.getElementById("savepng").addEventListener("click", processPNG);    
+    document.getElementById("collagePrjFile").addEventListener("change", loadPrj);        
     
     window.onbeforeunload = function() {
         return "Beim verlassen der Seite gehen ungespeicherte Projektdaten verloren. Seite jetzt wirklich verlassen?";
@@ -107,36 +106,39 @@ function generate() {
     file = new Blob([makeJSONObj()], {type: "text/plain"});
     obj.href = URL.createObjectURL(file);
     obj.download = "collagePrj.collage";
+    
+    processPNG();
 }
 
 function processPNG() {
-    document.getElementById("exportbox").classList.toggle("hidden");
-    document.getElementById("exportState").innerHTML = "Export läuft - bitte warten... 0 %";
-    FullImages = Images.slice();
-    for (let i = 0; i < FullImages.length; i++) {
-        FullImages[i].FullImgProcessing = true;     
-    }
-    for (let i = 0; i < FullImages.length; i++) {
-        setFullImageData(FullImages[i], 1024);
+    /* check if all images are available */
+    if (procImgs == 0) {    
+        exportPNG();    
     }
 }
 
-function exportPNG() {
-    let procImgs = 0;
-    for (let i = 0; i < FullImages.length; i++) {        
-        if (FullImages[i].FullImgProcessing) {
+function ShowFullResState() {
+    procImgs = 0;
+    for (let i = 0; i < Images.length; i++) {        
+        if (Images[i].FullImgProcessing) {
             procImgs ++;
         }
     }
     
-    let percProc = Math.ceil((FullImages.length - procImgs) / FullImages.length * 100);
+    let percProc = Math.ceil((Images.length - procImgs) / Images.length * 100);
     
-    document.getElementById("exportState").innerHTML = "Export läuft - bitte warten..." + percProc + " %";
-    if (procImgs > 0) {
-        console.log("still remaining processes! Remaining:" + procImgs);
-        return;
+    document.getElementById("ImgDataState").innerHTML = "Erzeuge Bilddaten - " + percProc + " %";
+    if (procImgs == 0) {
+        processPNG();
+        document.getElementById("saveprj").innerHTML = "Projekt speichern";
+        document.getElementById("savepnglink").innerHTML = "PNG exportieren";        
+    } else {
+        document.getElementById("saveprj").innerHTML = "";
+        document.getElementById("savepnglink").innerHTML = "";        
     }
-    
+}
+
+function exportPNG() {    
     let obj;
     let file;
     
@@ -148,7 +150,6 @@ function exportPNG() {
     document.getElementById('canvasbox').innerHTML = "";
     document.getElementById('canvasbox').appendChild(cvas);
     
-    
     var svgImg = new Image();
     svgImg.onload= function() {     
         let cvas = document.getElementById('cvas');        
@@ -159,16 +160,12 @@ function exportPNG() {
                 /* download button with png */
                 obj = document.getElementById("savepnglink");
                 obj.href = URL.createObjectURL(blob);
-                obj.download = "collage.png";                
-                obj.innerHTML = "Bild speichern";
-                
-                document.getElementById("exportState").innerHTML = "PNG Export: Fertig!";
-                document.getElementById("exportbox").classList.toggle("hidden");
+                obj.download = "collage.png";                                
             });                
         }
     }
     
-    svgImg.src = 'data:image/svg+xml;base64,' + btoa(svgGenerator(false, FullImages, true));    
+    svgImg.src = 'data:image/svg+xml;base64,' + btoa(svgGenerator(false, Images, true));    
 }
 
 function svgGenerator(preview, imgCollection, fullRes) {
@@ -267,6 +264,7 @@ function setImgPreview(cImg, res) {
                 cImg.Error = true;
             }
             generateImgListEditor(); 
+            setFullImageData(cImg, 1280);
         });            
     }
 }
@@ -280,12 +278,11 @@ function setFullImageData(cImg, res) {
             if (resizedDataUrl == "ERR") {
                 cImg.Error = true;
             }
-            exportPNG(); 
+            ShowFullResState(); 
         });            
     } else {
-        cImg.FullImgProcessing = false; 
-        console.log("The file obj is null :-(");
-        exportPNG(); 
+        cImg.FullImgProcessing = false;         
+        ShowFullResState(); 
     }
 }
 
@@ -330,6 +327,8 @@ function dropImages(e) {
         
         setImgPreview(cImg, 400);
     }
+    
+    document.getElementById("ImgDataState").innerHTML = "Erzeuge Bilddaten - ... %";
     
     generateImgListEditor();
 }
@@ -538,6 +537,9 @@ function getCollageYPos(size, maxpartitions, margin, imgheight, subtitle) {
 
 /* create a JSON that contains the projects data. Make it available for saving the current project */
 function makeJSONObj() {
+    if (procImgs > 0) {
+        return;
+    }
     let jsonObj = [];    
     let pObj = {};
     pObj ["collageWidth"] = collageWidth;
@@ -559,6 +561,7 @@ function makeJSONObj() {
         let iObj = {};
         iObj ["FileName"] = Images[i].FileName;
         iObj ["Preview"] = Images[i].Preview;
+        iObj ["FullImg"] = Images[i].FullImg;
         iObj ["SubTitle"] = Images[i].SubTitle;
         iObj ["Visible"] = Images[i].Visible;
         iObj ["XSpan"] = Images[i].XSpan;
@@ -614,13 +617,17 @@ function interpretPrj(str) {
     for (let i = 1; i < jsonObj.length; i++) {
         Images.push(new CollageImage(null, jsonObj[i].FileName, jsonObj[i].SubTitle, jsonObj[i].Visible));
         Images[i-1].Preview = jsonObj[i].Preview;
+        Images[i-1].FullImg = jsonObj[i].FullImg;        
         Images[i-1].XSpan = jsonObj[i].XSpan;
         Images[i-1].YSpan = jsonObj[i].YSpan;
         Images[i-1].Error = jsonObj[i].Error;
         Images[i-1].Processing = false;        
+        Images[i-1].FullImgProcessing = false;        
     }
     
     generateImgListEditor();
+    
+    ShowFullResState();
 }
 
 
