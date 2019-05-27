@@ -64,6 +64,10 @@ function initUI() {
     }
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);
+    
+    window.onbeforeunload = function() {
+        return "Beim verlassen der Seite gehen ungespeicherte Projektdaten verloren. Seite jetzt wirklich verlassen?";
+    };
 }
 
 function generate() {
