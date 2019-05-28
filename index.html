@@ -11,13 +11,13 @@
             </div>            
             <div class="box projectbox">     
                 <h2>Projekt:</h2>
-                <p>Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile" accept=".collage"/></p>                
+                <p>Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile" accept=".collage"/></p>
                 <p>
-                    <a href="" id="saveprj" class="hidden" download>Projekt speichern</a> 
-                    <a href="" id="savepng" class="hidden" download>Als Bild speichern</a> 
-                    <a href="" id="savesvg" class="" download>SVG speichern</a>
+                    <a href="" id="saveprj" class="hidden" download>Projektdatei speichern</a> 
+                    <a href="" id="savepng" class="hidden" download>Bild (PNG) speichern</a> 
+                    <a href="" id="savesvg" class="" download>SVG speichern*</a>
                 </p>
-                <p>Das SVG muss sich zur weiteren Verarbeitung im selben Verzeichnis wie die Bilder befinden!</p>
+                <p>*) Das SVG muss sich zur weiteren Verarbeitung im selben Verzeichnis wie die Bilder befinden!</p>
             </div>
         </div>     
         <div id="progressbox" class="exportBox hidden">            
@@ -31,14 +31,17 @@
                 <p style="text-align:center;">
                     <a href="" style="color:cornflowerblue;font-size:2em;" id="savepnglink" class="hidden" download>Speichern</a>
                 </p>
+                <p style="text-align:center;">
+                    <a href="" style="color:cornflowerblue;font-size:1em;" id="discardpng" class="hidden" download>Abbrechen</a>
+                </p>
             </div>
         </div>
         <div class="box" id="parameters">
             <h2>Parameter:</h2>
             <table>                            
                 <tr>
-                    <td>Auflösung X:</td><td><input class="paramField smallField" type="number" id="collageWidth" value="800">px</td>
-                    <td>Auflösung Y:</td><td><input class="paramField smallField" type="number" id="collageHeight" value="1000">px</td>
+                    <td>Auflösung X:</td><td><input class="paramField smallField" type="number" id="collageWidth" value="1024">px</td>
+                    <td>Auflösung Y:</td><td><input class="paramField smallField" type="number" id="collageHeight" value="768">px</td>
                 </tr>
                     <td>Spalten:</td><td><input class="paramField smallField" type="number" id="columns" value="3"></td>
                     <td>Max. Zeilen:</td><td><input class="paramField smallField" type="number" id="maxRows" value="3"></td>            

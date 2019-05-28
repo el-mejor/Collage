@@ -37,7 +37,6 @@ class CollageImage {
     }
 }
 
-
 /* initialize ui */
 function initUI() {
     let obj;
@@ -68,6 +67,10 @@ function initUI() {
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);        
     document.getElementById("savepng").addEventListener("click", processPNG);    
+    document.getElementById("discardpng").addEventListener("click", function(e) { 
+        e.preventDefault(); 
+        document.getElementById("exportbox").classList.add("hidden"); 
+    });  
     
     window.onbeforeunload = function() {
         return "Beim verlassen der Seite gehen ungespeicherte Projektdaten verloren. Seite jetzt wirklich verlassen?";
@@ -219,7 +222,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
                     ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:none;stroke:lime;stroke-width:3px;stroke-dasharray:15,15'/>";
                 }
 
-                iimg++;
+                iimg++;                
             }
         }
     }
@@ -230,13 +233,16 @@ function svgGenerator(preview, imgCollection, fullRes) {
 
 /* start processing of export PNG */
 function processPNG(e) {
-    /* check if all images are available */
-    if (procImgs == 0) {    
-        e.preventDefault();
+    e.preventDefault();
+    
+    /* check if all images are available */    
+    if (procImgs == 0) {  
         document.getElementById("exportbox").classList.remove("hidden");
         document.getElementById("savepnglink").classList.add("hidden");
+        document.getElementById("discardpng").classList.add("hidden");
         document.getElementById("exportmsg").innerHTML = "Die Collage wird erstellt ...";
-        exportPNG();    
+        
+        setTimeout(function() { exportPNG(); }, 100);
     }
 }
 
@@ -260,12 +266,13 @@ function exportPNG() {
             cvas.getContext("2d").drawImage(svgImg, 0, 0);        
             
             cvas.toBlob(function(blob) {                
-                /* download button with png */
+                /* download button with png */                
                 obj = document.getElementById("savepnglink");
                 obj.href = URL.createObjectURL(blob);
                 obj.download = "collage.png";    
                 document.getElementById("exportmsg").innerHTML = "Die Collage ist bereit zum speichern ...";
                 obj.classList.remove("hidden");
+                document.getElementById("discardpng").classList.remove("hidden");
                 obj.addEventListener("click", function() {
                     document.getElementById("exportbox").classList.add("hidden");
                 });
