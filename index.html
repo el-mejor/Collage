@@ -11,14 +11,27 @@
             </div>            
             <div class="box projectbox">     
                 <h2>Projekt:</h2>
-                <p>Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile" accept=".collage"/></p>
-                <p><span id="ImgDataState"></span> </p>
-                <p><a href="" id="saveprj" download></a> <a href="" id="savepnglink" class="" download></a> <a href="" id="savesvg" download>SVG speichern</a></p>
+                <p>Gespeichertes Projekt fortsetzen:<input type='file' id="collagePrjFile" accept=".collage"/></p>                
+                <p>
+                    <a href="" id="saveprj" class="hidden" download>Projekt speichern</a> 
+                    <a href="" id="savepng" class="hidden" download>Als Bild speichern</a> 
+                    <a href="" id="savesvg" class="" download>SVG speichern</a>
+                </p>
                 <p>Das SVG muss sich zur weiteren Verarbeitung im selben Verzeichnis wie die Bilder befinden!</p>
             </div>
         </div>     
+        <div id="progressbox" class="exportBox hidden">            
+            <div class="centerdiv">
+                <canvas id="ImgDataState" class="hidden" width="600" height="40"></canvas>
+            </div>
+        </div>
         <div id="exportbox" class="exportBox hidden">            
-            <span id="exportState" class="exportState"></span>                                  
+            <div class="centerdiv">
+                <p id="exportmsg" style="text-align:center;color:white;font-size:2em;"></p>
+                <p style="text-align:center;">
+                    <a href="" style="color:cornflowerblue;font-size:2em;" id="savepnglink" class="hidden" download>Speichern</a>
+                </p>
+            </div>
         </div>
         <div class="box" id="parameters">
             <h2>Parameter:</h2>

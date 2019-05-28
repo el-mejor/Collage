@@ -67,12 +67,50 @@ function initUI() {
     }
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);        
+    document.getElementById("savepng").addEventListener("click", processPNG);    
     
     window.onbeforeunload = function() {
         return "Beim verlassen der Seite gehen ungespeicherte Projektdaten verloren. Seite jetzt wirklich verlassen?";
     };
 }
 
+/* build the image list editor */
+function generateImgListEditor() {
+    document.getElementById("dropzone").innerHTML = "<table id='imagelisteditor'></table>";
+    for (let i = 0; i < Images.length; i++) {
+        let rClass = "";
+        if (i == Selection) {
+            rClass = "rowSelected";
+        }
+        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover' id='editorRow" + i + "'><td>" + (i + 1) +  ".</td>";
+        html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
+		if (!Images[i].Processing && !Images[i].Error) {
+            if (Images[i].Visible) {
+                html += "<td>Untertitel: <input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "'> </td>";
+                html += "<td>Breite: <input class='smallField' type='number' id='xspan" + i + "' onClick=\"xSpanImage('" + i + "', this)\" value='" + Images[i].XSpan + "'></td>";  
+                html += "<td>Höhe: <input class='smallField' type='number' id='yspan" + i + "' onClick=\"ySpanImage('" + i + "', this)\" value='" + Images[i].YSpan + "'></td>";  
+            } else  {
+                html += "<td></td><td></td><td></td>";
+            }
+        } else if (Images[i].Error) {
+            html += "<td style='color:red;font-weight:bold;'>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
+        } else {
+            html += "<td style='color:orange;font-weight:bold;'>Erzeuge Vorschau ...</td><td></td><td></td>";
+        }
+
+        html += "<td><button type='button' class='editorbutton up' id='up" + i + "' onClick=\"upImage('" + i + "')\" ><span></span></button>";  
+        html += "<button type='button' class='editorbutton dwn' id='down" + i + "' onClick=\"downImage('" + i + "')\"><span></span></button>";
+        html += "<button type='button' class='editorbutton del' id='del" + i + "' onClick=\"delImage('" + i + "')\"><span></span></button></td>";  
+        html += "</tr>";            
+
+		document.getElementById("imagelisteditor").innerHTML += html;
+        
+    }
+    
+    generate();
+}
+
+/* start generating svg */
 function generate() {
     let obj;
     let file;
@@ -106,68 +144,9 @@ function generate() {
     file = new Blob([makeJSONObj()], {type: "text/plain"});
     obj.href = URL.createObjectURL(file);
     obj.download = "collagePrj.collage";
-    
-    processPNG();
-}
+}   
 
-function processPNG() {
-    /* check if all images are available */
-    if (procImgs == 0) {    
-        exportPNG();    
-    }
-}
-
-function ShowFullResState() {
-    procImgs = 0;
-    for (let i = 0; i < Images.length; i++) {        
-        if (Images[i].FullImgProcessing) {
-            procImgs ++;
-        }
-    }
-    
-    let percProc = Math.ceil((Images.length - procImgs) / Images.length * 100);
-    
-    document.getElementById("ImgDataState").innerHTML = "Erzeuge Bilddaten - " + percProc + " %";
-    if (procImgs == 0) {
-        processPNG();
-        document.getElementById("saveprj").innerHTML = "Projekt speichern";
-        document.getElementById("savepnglink").innerHTML = "PNG exportieren";        
-    } else {
-        document.getElementById("saveprj").innerHTML = "";
-        document.getElementById("savepnglink").innerHTML = "";        
-    }
-}
-
-function exportPNG() {    
-    let obj;
-    let file;
-    
-    /* test direct jpg dl */
-    let cvas = document.createElement('canvas');
-    cvas.setAttribute("id", "cvas");
-    cvas.setAttribute("width", collageWidth);
-    cvas.setAttribute("height", collageHeight);
-    document.getElementById('canvasbox').innerHTML = "";
-    document.getElementById('canvasbox').appendChild(cvas);
-    
-    var svgImg = new Image();
-    svgImg.onload= function() {     
-        let cvas = document.getElementById('cvas');        
-        if (cvas) {            
-            cvas.getContext("2d").drawImage(svgImg, 0, 0);        
-            
-            cvas.toBlob(function(blob) {                
-                /* download button with png */
-                obj = document.getElementById("savepnglink");
-                obj.href = URL.createObjectURL(blob);
-                obj.download = "collage.png";                                
-            });                
-        }
-    }
-    
-    svgImg.src = 'data:image/svg+xml;base64,' + btoa(svgGenerator(false, Images, true));    
-}
-
+/* create SVG */
 function svgGenerator(preview, imgCollection, fullRes) {
     /* set adhoc parameters for scaling (preview) */
     let cWidth = collageWidth;
@@ -249,62 +228,97 @@ function svgGenerator(preview, imgCollection, fullRes) {
     return ret;
 }
 
-/* set colors from selection */
-function setColors() {
-    generate();
-}
-
-/* generate image preview and callback generator */
-function setImgPreview(cImg, res) {
-    if (cImg.File) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
-            cImg.Preview = resizedDataUrl; 
-            cImg.Processing = false; 
-            if (resizedDataUrl == "ERR") {
-                cImg.Error = true;
-            }
-            generateImgListEditor(); 
-            setFullImageData(cImg, 1280);
-        });            
+/* start processing of export PNG */
+function processPNG(e) {
+    /* check if all images are available */
+    if (procImgs == 0) {    
+        e.preventDefault();
+        document.getElementById("exportbox").classList.remove("hidden");
+        document.getElementById("savepnglink").classList.add("hidden");
+        document.getElementById("exportmsg").innerHTML = "Die Collage wird erstellt ...";
+        exportPNG();    
     }
 }
 
-/* generate full images for export and callback exporter */
-function setFullImageData(cImg, res) {
-    if (cImg.File && cImg.Visible) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
-            cImg.FullImg = resizedDataUrl; 
-            cImg.FullImgProcessing = false; 
-            if (resizedDataUrl == "ERR") {
-                cImg.Error = true;
-            }
-            ShowFullResState(); 
-        });            
-    } else {
-        cImg.FullImgProcessing = false;         
-        ShowFullResState(); 
-    }
-}
-
-/*add placeholder */
-function addPlaceHolder() {
+/* export PNG */
+function exportPNG() {    
+    let obj;
+    let file;
     
-    let i = Images.length - 1;
-    if (Selection > -1) {
-        i = Selection;
-        
-        if (i >= Images.length) {
-            i = Images.length - 1;
+    /* test direct jpg dl */
+    let cvas = document.createElement('canvas');
+    cvas.setAttribute("id", "cvas");
+    cvas.setAttribute("width", collageWidth);
+    cvas.setAttribute("height", collageHeight);
+    document.getElementById('canvasbox').innerHTML = "";
+    document.getElementById('canvasbox').appendChild(cvas);
+    
+    var svgImg = new Image();
+    svgImg.onload= function() {     
+        let cvas = document.getElementById('cvas');        
+        if (cvas) {            
+            cvas.getContext("2d").drawImage(svgImg, 0, 0);        
+            
+            cvas.toBlob(function(blob) {                
+                /* download button with png */
+                obj = document.getElementById("savepnglink");
+                obj.href = URL.createObjectURL(blob);
+                obj.download = "collage.png";    
+                document.getElementById("exportmsg").innerHTML = "Die Collage ist bereit zum speichern ...";
+                obj.classList.remove("hidden");
+                obj.addEventListener("click", function() {
+                    document.getElementById("exportbox").classList.add("hidden");
+                });
+            });                
         }
     }
     
-    if (i < 0) {
-        i = 0;
+    svgImg.src = 'data:image/svg+xml;base64,' + btoa(svgGenerator(false, Images, true));    
+}
+
+/* state progress of image importing */
+function ShowImpProgress() {
+    procImgs = 0;
+    for (let i = 0; i < Images.length; i++) {        
+        if (Images[i].Processing) {
+            procImgs ++;
+        }
+        if (Images[i].FullImgProcessing) {
+            procImgs ++;
+        }
     }
     
-    Images.splice(i, 0, new CollageImage(null, "frei", "", false));    
+    let percProc = (Images.length * 2 - procImgs) / (Images.length * 2);
+    
+    if (procImgs > 0) {
+        document.getElementById("saveprj").classList.add("hidden");
+        document.getElementById("savepng").classList.add("hidden");      
         
-    generateImgListEditor();
+        document.getElementById("progressbox").classList.remove("hidden");
+        document.getElementById("ImgDataState").classList.remove("hidden");
+        
+        // Draw progress bar        
+        let pbcanvas = document.getElementById("ImgDataState");
+        let ctx = pbcanvas.getContext("2d");    
+        ctx.fillStyle = 'dimgray';
+        ctx.clearRect(0, 0, pbcanvas.width, pbcanvas.height);
+        ctx.fillRect(0, 0, pbcanvas.width, pbcanvas.height);
+
+        ctx.fillStyle = 'CornflowerBlue';    
+        ctx.fillRect(0, 0, pbcanvas.width * (percProc), pbcanvas.height);
+
+        ctx.fillStyle = 'white';
+        ctx.font = "20px Arial";
+        ctx.fillText("Bearbeite Bilder - " + Math.ceil(percProc * 100) + "% ", 5, pbcanvas.height / 2 + 6);
+    } else {
+        document.getElementById("saveprj").classList.remove("hidden");
+        document.getElementById("savepng").classList.remove("hidden");        
+        
+        document.getElementById("progressbox").classList.add("hidden");
+        document.getElementById("ImgDataState").classList.add("hidden");
+        
+        generateImgListEditor();
+    }    
 }
 
 /*on droping imahes*/
@@ -328,45 +342,63 @@ function dropImages(e) {
         setImgPreview(cImg, 400);
     }
     
-    document.getElementById("ImgDataState").innerHTML = "Erzeuge Bilddaten - ... %";
+    ShowImpProgress();
     
     generateImgListEditor();
 }
 
-/* build the image list editor */
-function generateImgListEditor() {
-    document.getElementById("dropzone").innerHTML = "<table id='imagelisteditor'></table>";
-    for (let i = 0; i < Images.length; i++) {
-        let rClass = "";
-        if (i == Selection) {
-            rClass = "rowSelected";
-        }
-        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover' id='editorRow" + i + "'><td>" + (i + 1) +  ".</td>";
-        html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
-		if (!Images[i].Processing && !Images[i].Error) {
-            if (Images[i].Visible) {
-                html += "<td>Untertitel: <input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "'> </td>";
-                html += "<td>Breite: <input class='smallField' type='number' id='xspan" + i + "' onClick=\"xSpanImage('" + i + "', this)\" value='" + Images[i].XSpan + "'></td>";  
-                html += "<td>Höhe: <input class='smallField' type='number' id='yspan" + i + "' onClick=\"ySpanImage('" + i + "', this)\" value='" + Images[i].YSpan + "'></td>";  
-            } else  {
-                html += "<td></td><td></td><td></td>";
+/* generate image preview and callback generator */
+function setImgPreview(cImg, res) {
+    if (cImg.File) {
+        resize_file(cImg.File, res, function (resizedDataUrl) { 
+            cImg.Preview = resizedDataUrl; 
+            cImg.Processing = false; 
+            if (resizedDataUrl == "ERR") {
+                cImg.Error = true;
             }
-        } else if (Images[i].Error) {
-            html += "<td style='color:red;font-weight:bold;'>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
-        } else {
-            html += "<td style='color:orange;font-weight:bold;'>Erzeuge Vorschau ...</td><td></td><td></td>";
-        }
+            ShowImpProgress(); 
+            generateImgListEditor();             
+            setFullImageData(cImg, 1280);            
+        });            
+    }
+}
 
-        html += "<td><button type='button' class='editorbutton up' id='up" + i + "' onClick=\"upImage('" + i + "')\" ><span></span></button>";  
-        html += "<button type='button' class='editorbutton dwn' id='down" + i + "' onClick=\"downImage('" + i + "')\"><span></span></button>";
-        html += "<button type='button' class='editorbutton del' id='del" + i + "' onClick=\"delImage('" + i + "')\"><span></span></button></td>";  
-        html += "</tr>";            
+/* generate full images for export and callback exporter */
+function setFullImageData(cImg, res) {
+    if (cImg.File && cImg.Visible) {
+        resize_file(cImg.File, res, function (resizedDataUrl) { 
+            cImg.FullImg = resizedDataUrl; 
+            cImg.FullImgProcessing = false; 
+            if (resizedDataUrl == "ERR") {
+                cImg.Error = true;
+            }
+            ShowImpProgress(); 
+        });            
+    } else {
+        cImg.FullImgProcessing = false;         
+        ShowImpProgress(); 
+    }
+}
 
-		document.getElementById("imagelisteditor").innerHTML += html;
+/*add placeholder */
+function addPlaceHolder() {
+    
+    let i = Images.length - 1;
+    if (Selection > -1) {
+        i = Selection;
         
+        if (i >= Images.length) {
+            i = Images.length - 1;
+        }
     }
     
-    generate();
+    if (i < 0) {
+        i = 0;
+    }
+    
+    Images.splice(i, 0, new CollageImage(null, "frei", "", false));    
+        
+    generateImgListEditor();
 }
 
 /* image list editor - select */
@@ -474,6 +506,11 @@ function downImage(nr) {
     generateImgListEditor();
 }
 
+/* set colors from selection */
+function setColors() {
+    generate();
+}
+
 /* image list editor - change SubTitle */
 function changeSubTitle(nr, sender) {
     nr = parseInt(nr, 10);
@@ -536,10 +573,7 @@ function getCollageYPos(size, maxpartitions, margin, imgheight, subtitle) {
 }  
 
 /* create a JSON that contains the projects data. Make it available for saving the current project */
-function makeJSONObj() {
-    if (procImgs > 0) {
-        return;
-    }
+function makeJSONObj() {    
     let jsonObj = [];    
     let pObj = {};
     pObj ["collageWidth"] = collageWidth;
@@ -627,9 +661,8 @@ function interpretPrj(str) {
     
     generateImgListEditor();
     
-    ShowFullResState();
+    ShowImpProgress();
 }
-
 
 /*helper*/
 function getRndInteger(min, max) {
