@@ -299,7 +299,7 @@ function ShowImpProgress() {
 
         ctx.fillStyle = 'white';
         ctx.font = "20px Arial";
-        ctx.fillText("Bearbeite Bilder - " + Math.ceil(percProc * 100) + "% ", 5, pbcanvas.height / 2 + 6);
+        ctx.fillText("Importiere Bilder - " + Math.ceil(percProc * 100) + "% ", 5, pbcanvas.height / 2 + 6);
     } else {
         document.getElementById("saveprj").classList.remove("hidden");
         document.getElementById("savepng").classList.remove("hidden");        
@@ -329,7 +329,7 @@ function dropImages(e) {
         let cImg = new CollageImage(e.dataTransfer.files[i], fName, fName, true);
         Images.push(cImg);        
         
-        setImgPreview(cImg, 400);
+        setImgPreview(cImg, 200);
     }
     
     ShowImpProgress();
