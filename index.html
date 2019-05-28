@@ -35,65 +35,57 @@
                     <a href="" style="color:cornflowerblue;font-size:1em;" id="discardpng" class="hidden" download>Abbrechen</a>
                 </p>
             </div>
-        </div>
-        <div class="box" id="parameters">
-            <h2>Parameter:</h2>
-            <table>                            
-                <tr>
-                    <td>Auflösung X:</td><td><input class="paramField smallField" type="number" id="collageWidth" value="1024">px</td>
-                    <td>Auflösung Y:</td><td><input class="paramField smallField" type="number" id="collageHeight" value="768">px</td>
-                </tr>
-                    <td>Spalten:</td><td><input class="paramField smallField" type="number" id="columns" value="3"></td>
-                    <td>Max. Zeilen:</td><td><input class="paramField smallField" type="number" id="maxRows" value="3"></td>            
-                <tr>
-                    <td>Abstant X:</td><td><input class="paramField smallField" type="number" id="XMargin" value="10">px</td>
-                    <td>Abstant Y:</td><td><input class="paramField smallField" type="number" id="YMargin" value="10">px</td>            
-                </tr>
-                <tr>
-                    <td>Seitenverhältnis:</td>
-                    <td>
-                        <select class="paramField" id="AspectRatio">
-                          <option value="1000">1:1</option>
-                          <option value="1500">3:2</option>
-                          <option value="1333">4:3</option>
-                          <option value="1778">16:9</option>
-                          <option value="667">2:3</option>
-                          <option value="750">3:4</option>                          
-                        </select>
-                    </td>
-                    <!--<td>Skalierung:</td><td><input class="paramField" type="number" id="Scale" value="100">%</td>-->
-                </tr>
-                <tr>
-                    <td>Untertitel Höhe:</td><td> <input class="paramField smallField" type="number" id="SubTitleHeight" value="20">px</td>     
-                    <td>Rotation:</td><td> <input class="paramField smallField" type="number" id="Rotation" value="0">px</td>     
-                </tr> 
-                <tr>
-                    <td>Hintergrundfarbe: </td>
-                    <td>
-                        <select class="paramField colorSelect" id="BGColor" onClick="setColors()">
-                            <option value="white">Default</option>
-                        </select>
-                    </td>
-                    <td>Bilduntergrundfarbe: </td>
-                    <td>
-                        <select class="paramField colorSelect" id="ImgBgColor" onClick="setColors()">
-                            <option value="black">Default</option>
-                        </select>
-                    </td>
-                    <td>Untertitel Textfarbe: </td>
-                    <td>
-                        <select class="paramField colorSelect" id="StTxtColor" onClick="setColors()">
-                            <option value="white">Default</option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-
-
-        </div>        
+        </div>     
         <div class="workspace">
-            
             <div class="box"  style="flex-grow: 1;">
+                <h2>Parameter:</h2>
+                <table>                            
+                    <tr>
+                        <td>Auflösung X:</td><td><input class="paramField smallField" type="number" id="collageWidth" value="1024">px</td>
+                        <td>Auflösung Y:</td><td><input class="paramField smallField" type="number" id="collageHeight" value="768">px</td>
+                        <td>Hintergrundfarbe: </td>
+                        <td>
+                            <select class="paramField colorSelect" id="BGColor" onClick="setColors()">
+                                <option value="white">Default</option>
+                            </select>
+                        </td>
+                    </tr>
+                        <td>Spalten:</td><td><input class="paramField smallField" type="number" id="columns" value="3"></td>
+                        <td>Max. Zeilen:</td><td><input class="paramField smallField" type="number" id="maxRows" value="3"></td> 
+                        <td>Bilduntergrundfarbe: </td>
+                        <td>
+                            <select class="paramField colorSelect" id="ImgBgColor" onClick="setColors()">
+                                <option value="black">Default</option>
+                            </select>
+                        </td>
+                    <tr>
+                        <td>Abstant X:</td><td><input class="paramField smallField" type="number" id="XMargin" value="10">px</td>
+                        <td>Abstant Y:</td><td><input class="paramField smallField" type="number" id="YMargin" value="10">px</td>
+                        <td>Untertitel Textfarbe: </td>
+                        <td>
+                            <select class="paramField colorSelect" id="StTxtColor" onClick="setColors()">
+                                <option value="white">Default</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Seitenverhältnis:</td>
+                        <td>
+                            <select class="paramField" id="AspectRatio">
+                              <option value="1000">1:1</option>
+                              <option value="1500">3:2</option>
+                              <option value="1333">4:3</option>
+                              <option value="1778">16:9</option>
+                              <option value="667">2:3</option>
+                              <option value="750">3:4</option>                          
+                            </select>
+                        </td>
+                        <td>Untertitel Höhe:</td><td> <input class="paramField smallField" type="number" id="SubTitleHeight" value="20">px</td>     
+                        <td>Rotation:</td><td> <input class="paramField smallField" type="number" id="Rotation" value="0">°</td> 
+                        <!--<td>Skalierung:</td><td><input class="paramField" type="number" id="Scale" value="100">%</td>-->
+                    </tr>
+                </table>
+                <p></p>
                 <h2>Bilder:</h2> 
                 Bilder hier ablegen:
                 <div class="dropzone" id="dropzone">

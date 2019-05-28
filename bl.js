@@ -143,10 +143,10 @@ function svgGenerator(preview, imgCollection, fullRes) {
     let eSth = SubTitleHeight;
     
     if (preview) {
-        cWidth = 800;
+        cWidth = 600;
         cHeight = cWidth * (collageHeight / collageWidth);
-        iXMargin = iXMargin * cWidth / collageWidth;
-        iYMargin = iYMargin * cHeight / collageHeight;
+        iXMargin = iXMargin * (cWidth / collageWidth);
+        iYMargin = iYMargin * (cHeight / collageHeight);
         
         eSth = (SubTitleHeight / collageHeight) * cHeight;
     }
@@ -164,7 +164,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
     let xpos, ypos, eX, eY, eW, eH, eTransX, eTransY, eRot, iimg;
     iimg = 0;
     xpos = getCollageXPos(cWidth, columns, iXMargin);
-    ypos = getCollageYPos(cHeight, maxrows, iYMargin, xpos[1] / AspectRatio, SubTitleHeight);
+    ypos = getCollageYPos(cHeight, maxrows, iYMargin, xpos[1] / AspectRatio, eSth);
     
     for (let y = 0; y < ypos.length; y += 2) {
         for (let x = 0; x < xpos.length; x += 2) {
