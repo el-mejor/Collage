@@ -15,27 +15,8 @@ var ImgBackColor = "black";
 var BackgroundColor = "white";
 var TextColor = "white";
 var Selection = -1;
-var HtmlColorNames = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGrey","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","Darkorange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkSlateGrey","DarkTurquoise","DarkViolet","DeepPink","DeepSkyBlue","DimGray","DimGrey","DodgerBlue","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Grey","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGray","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateGray","LightSlateGrey","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
-
 var procImgs = -1;
 var Images = [];
-class CollageImage {     
-    constructor(file, filename, subtitle, visible) {     
-        this.File = file;
-        this.FileName = filename; 
-        this.SubTitle = subtitle; 
-        this.Visible = visible;  
-        this.XSpan = 1;
-        this.YSpan = 1;
-        if (visible) {
-            this.Preview = getProcessingGif();
-        }
-        this.Processing = visible;
-        this.Error = false;
-        this.FullImg;
-        this.FullImgProcessing = visible;
-    }
-}
 
 /* initialize ui */
 function initUI() {
@@ -158,13 +139,16 @@ function svgGenerator(preview, imgCollection, fullRes) {
     let iYMargin = YMargin;
     let ret = "";
     let rElement;
-    let addElement;
+    let addElement;    
+    let eSth = SubTitleHeight;
     
     if (preview) {
         cWidth = 800;
         cHeight = cWidth * (collageHeight / collageWidth);
         iXMargin = iXMargin * cWidth / collageWidth;
         iYMargin = iYMargin * cHeight / collageHeight;
+        
+        eSth = (SubTitleHeight / collageHeight) * cHeight;
     }
     
     /* xmlns:xlink='http://www.w3.org/1999/xlink' */
@@ -186,7 +170,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
         for (let x = 0; x < xpos.length; x += 2) {
             if (iimg < imgCollection.length) {
                 eW = Math.round(xpos[x + 1]) * imgCollection[iimg].XSpan + (2 * iXMargin) * (imgCollection[iimg].XSpan - 1);
-                eH = Math.round(ypos[y + 1]) * imgCollection[iimg].YSpan + (2 * iYMargin) * (imgCollection[iimg].YSpan - 1) + (SubTitleHeight) * (imgCollection[iimg].YSpan - 1);
+                eH = Math.round(ypos[y + 1]) * imgCollection[iimg].YSpan + (2 * iYMargin) * (imgCollection[iimg].YSpan - 1) + (eSth) * (imgCollection[iimg].YSpan - 1);
 
                 eX = Math.round(-xpos[x + 1] / 2);
                 eY = Math.round(-ypos[y + 1] / 2);
@@ -194,7 +178,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
                 eTransX = Math.round(xpos[x] + xpos[x + 1] / 2);            
                 eTransY = Math.round(ypos[y] + ypos[y + 1] / 2);
                 eRot = Math.round(getRndInteger(RotRange[0], RotRange[1]));
-
+                
                 if (iimg < imgCollection.length && imgCollection[iimg].Visible && !imgCollection[iimg].Error) {      
                     let iFile = imgCollection[iimg].FileName;
                     let cHandler = ""; 
@@ -208,18 +192,17 @@ function svgGenerator(preview, imgCollection, fullRes) {
                         iFile = imgCollection[iimg].FullImg;
                     }
                     
-                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:" + ImgBackColor + ";'/>";
+                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + eSth) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:" + ImgBackColor + ";'/>";
                     
                     ret += "<image xlink:href='" + iFile + "' x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + eH + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ") scale(" + ImgScale + ")' preserveAspectRatio='xMidYMid slice' " + cHandler + "/>";
                     
-                    if (SubTitleHeight > 0) {
-                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + 15) + "px' alignment-baseline='middle' text-anchor='left' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan style='fill:" + TextColor + ";font-size:15px'>" + imgCollection[iimg].SubTitle + "</tspan></text>";                
+                    if (eSth > 0) {
+                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + (eSth * 0.8)) + "px' alignment-baseline='middle' text-anchor='left' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan style='fill:" + TextColor + ";font-family:Arial,Verdana,sans-serif;font-size:" + (eSth * 0.8) + "'>" + imgCollection[iimg].SubTitle + "</tspan></text>"; 
                     }
                 }
                 
                 if (Selection == iimg && preview) {
-                    
-                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + SubTitleHeight) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:none;stroke:lime;stroke-width:3px;stroke-dasharray:15,15'/>";
+                    ret += "<rect x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + (eH + eSth) + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")' style='fill:none;stroke:lime;stroke-width:3px;stroke-dasharray:15,15'/>";
                 }
 
                 iimg++;                
@@ -671,8 +654,29 @@ function interpretPrj(str) {
     ShowImpProgress();
 }
 
-/*helper*/
+/*helper and classes*/
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
+/* image data container */
+class CollageImage {     
+    constructor(file, filename, subtitle, visible) {     
+        this.File = file;
+        this.FileName = filename; 
+        this.SubTitle = subtitle; 
+        this.Visible = visible;  
+        this.XSpan = 1;
+        this.YSpan = 1;
+        if (visible) {
+            this.Preview = getProcessingGif();
+        }
+        this.Processing = visible;
+        this.Error = false;
+        this.FullImg;
+        this.FullImgProcessing = visible;
+    }
+}
+
+/* all html color names */
+var HtmlColorNames = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGrey","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","Darkorange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkSlateGrey","DarkTurquoise","DarkViolet","DeepPink","DeepSkyBlue","DimGray","DimGrey","DodgerBlue","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Grey","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGray","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateGray","LightSlateGrey","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
