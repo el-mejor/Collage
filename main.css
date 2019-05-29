@@ -46,7 +46,7 @@ div.header {
     align-items:    flex-start;    
     top: 0;
     margin:         0px !important;
-    margin-bottom:  20px !important;
+    margin-bottom:  4px !important;
     background:     white !important;    
     position: -webkit-sticky; /* Safari */
     position: sticky;

@@ -142,9 +142,15 @@ function svgGenerator(preview, imgCollection, fullRes) {
     let addElement;    
     let eSth = SubTitleHeight;
     
-    if (preview) {
-        cWidth = 600;
-        cHeight = cWidth * (collageHeight / collageWidth);
+    if (preview) {        
+        cHeight = (window.innerHeight - document.getElementById("header").clientHeight - document.getElementById("footer").clientHeight) - 100;
+        cWidth = cHeight * (collageWidth / collageHeight);
+        
+        if (cWidth > window.innerWidth) {
+            cWidth = document.getElementById("preview").clientWidth;
+            cHeight = cWidth * (collageHeight / collageWidth);            
+        }
+        
         iXMargin = iXMargin * (cWidth / collageWidth);
         iYMargin = iYMargin * (cHeight / collageHeight);
         
@@ -197,7 +203,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
                     ret += "<image xlink:href='" + iFile + "' x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + eH + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ") scale(" + ImgScale + ")' preserveAspectRatio='xMidYMid slice' " + cHandler + "/>";
                     
                     if (eSth > 0) {
-                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + (eSth * 0.8)) + "px' alignment-baseline='middle' text-anchor='left' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan style='fill:" + TextColor + ";font-family:Arial,Verdana,sans-serif;font-size:" + (eSth * 0.8) + "'>" + imgCollection[iimg].SubTitle + "</tspan></text>"; 
+                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + (eSth * 0.8)) + "px' alignment-baseline='middle' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan x='0' text-anchor='middle' style='fill:" + TextColor + ";font-family:Arial,Verdana,sans-serif;font-size:" + (eSth * 0.8) + "'>" + imgCollection[iimg].SubTitle + "</tspan></text>"; 
                     }
                 }
                 
