@@ -142,9 +142,15 @@ function svgGenerator(preview, imgCollection, fullRes) {
     let addElement;    
     let eSth = SubTitleHeight;
     
-    if (preview) {
-        cWidth = 600;
-        cHeight = cWidth * (collageHeight / collageWidth);
+    if (preview) {        
+        cHeight = (window.innerHeight - document.getElementById("header").clientHeight - document.getElementById("footer").clientHeight) - 100;
+        cWidth = cHeight * (collageWidth / collageHeight);
+        
+        if (cWidth > window.innerWidth) {
+            cWidth = document.getElementById("preview").clientWidth;
+            cHeight = cWidth * (collageHeight / collageWidth);            
+        }
+        
         iXMargin = iXMargin * (cWidth / collageWidth);
         iYMargin = iYMargin * (cHeight / collageHeight);
         
