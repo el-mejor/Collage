@@ -15,9 +15,10 @@ body {
 }
 
 div.exportBox {    
-    position:       fixed;    
-    top:            0;
-    left:           0;
+    position:       absolute;    
+    top:            50%;
+    left:           50%;
+    transform:      translate(-50%, -50%);
     width:          100vw;
     height:         100vh;
     margin:         0 auto;    
@@ -36,7 +37,6 @@ div.centerdiv {
     bottom:         0;
     left:           0;
     right:          0;
-    opacity:        1.0 !important;
 }
 
 div.header {    
@@ -49,8 +49,7 @@ div.header {
     margin-bottom:  4px !important;
     background:     white !important;    
     position: -webkit-sticky; /* Safari */
-    position: sticky;
-    
+    position: sticky;    
      
     -webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
     -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
@@ -58,11 +57,34 @@ div.header {
 }
 
 div.projectbox {    
+    border: 0;
+    border: 2px solid red !important;
     background:     gold !important;
     max-width:      30vw;
     float:          right;
-    margin:         10px !important;    
-    
+    margin:         10px !important;        
+}
+
+div.projectbox a, button {    
+    text-align: center;
+    margin: 2px;
+    color:  black;
+    border: 0;
+    outline: none;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 2px;
+    background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(190,190,190,1) 100%);
+    text-decoration: none;
+}
+
+div.projectbox a {
+    display: block;
+}
+
+div.projectbox a:active, button:active {    
+    background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(190,190,190,1) 100%) !important;
 }
 
 div.workspace {
@@ -88,6 +110,7 @@ span.title {
 }
 
 div.box {               
+    border: 0;    
     margin:         4px;
     background:     whitesmoke;
     padding:        10px;    
@@ -109,7 +132,7 @@ div.svgbox {
 
 div.dropzone {
     min-height:     100px;
-    border:         1px dotted blue;
+    border:         1px dotted dimgray;
     border-radius:  5px;
     padding:        10px;
     margin:         10px;
@@ -142,14 +165,30 @@ tr.enHover:hover {
 td {
     margin:         0px;
     padding-left:   5px;
-    padding-right:   5px;
-    border-right:   1px dotted lightgray;
+    padding-right:   5px;    
     border-bottom:  1px dotted lightgray;
 }
 
 input, select {
     margin-left:    5px;
     margin-right:   5px;    
+}
+
+input[type="number"],input[type="text"],select {   
+    border: 0;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 2px;
+    outline: none;    
+    transition: 0.25s;
+}
+
+input[type="number"] {
+    text-align: right;    
+}
+
+input[type="number"]:focus,input[type="text"]:focus,select:focus {    
+    border: 1px solid black !important;
 }
 
 input.smallField {
@@ -171,7 +210,7 @@ button.editorbutton span {
     padding-left:   15px;
 }
 
-button.del span {
+button.del span {    
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABEUlEQVQ4jZXTvU4CQRTF8d9uCPERLLe08hnwAYiNJQ9gpDF81Ba2oI0SHoESY6zdZ7C0orSgNmYLYsGsDjionGayd+//7NwzOxksWs0jPGCGq6KspLRoNeEaZzgtyuo1C/AzDkPfCMNtkwCP0QulN5zkeIpgGGAcgF2wwDzmmCd226tNdsC15g30cYCLhAnkuEzAdxhmYYs57nGeaExpgm5RVrK6sofJF4xvg3+abMCs54u1wscvX//xLh4BbqUDi3WD/sYIe8A/TLI/znka1lQmIwwb1v/2LrgbPW+bDPCeo5OA67RXRVmtgtE00dfJ0cYyKt7VcF2ITCZR3xLtOsRj60s1k7iJtaK8ztAuyurlE2O/YTaNFGIGAAAAAElFTkSuQmCC');
 }
 

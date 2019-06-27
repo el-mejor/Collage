@@ -70,7 +70,7 @@ function generateImgListEditor() {
         html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
 		if (!Images[i].Processing && !Images[i].Error) {
             if (Images[i].Visible) {
-                html += "<td>Untertitel: <input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "'> </td>";
+                html += "<td><input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "' placeholder='Untertitel'> </td>";
                 html += "<td>Breite: <input class='smallField' type='number' id='xspan" + i + "' onClick=\"xSpanImage('" + i + "', this)\" value='" + Images[i].XSpan + "'></td>";  
                 html += "<td>Höhe: <input class='smallField' type='number' id='yspan" + i + "' onClick=\"ySpanImage('" + i + "', this)\" value='" + Images[i].YSpan + "'></td>";  
             } else  {
