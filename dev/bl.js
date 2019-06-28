@@ -62,12 +62,25 @@ function initUI() {
 function generateImgListEditor() {
     document.getElementById("dropzone").innerHTML = "<table id='imagelisteditor'></table>";
     for (let i = 0; i < Images.length; i++) {
-        let rClass = "";
+        let rClass = "";      
+        let fClass = "";
+        
+        if (!Images[i].Processing && !Images[i].Error) {
+            fClass = "imgOK";
+            if (Images[i].FileName == "frei") {
+                fClass = "imgSpare";
+            }
+        } else if (Images[i].Error) {
+            fClass = "imgNOK";
+        } else {
+            fClass = "imgPrc";
+        }
+        
         if (i == Selection) {
             rClass = "rowSelected";
-        }
-        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover' id='editorRow" + i + "'><td>" + (i + 1) +  ".</td>";
-        html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
+        }        
+        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + "  enHover' id='editorRow" + i + "'><td class='" + fClass + "'>" + (i + 1) +  ".</td>";
+        html += "<td>" + Images[i].FileName + "</td>";
 		if (!Images[i].Processing && !Images[i].Error) {
             if (Images[i].Visible) {
                 html += "<td><input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "' placeholder='Untertitel'> </td>";
@@ -77,9 +90,9 @@ function generateImgListEditor() {
                 html += "<td></td><td></td><td></td>";
             }
         } else if (Images[i].Error) {
-            html += "<td style='color:red;font-weight:bold;'>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
+            html += "<td>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
         } else {
-            html += "<td style='color:orange;font-weight:bold;'>Erzeuge Vorschau ...</td><td></td><td></td>";
+            html += "<td>Importiere Bild ...</td><td></td><td></td>";
         }
 
         html += "<td><button type='button' class='editorbutton up' id='up" + i + "' onClick=\"upImage('" + i + "')\" ><span></span></button>";  
@@ -290,7 +303,7 @@ function ShowImpProgress() {
         document.getElementById("saveprj").classList.add("hidden");
         document.getElementById("savepng").classList.add("hidden");      
         
-        document.getElementById("progressbox").classList.remove("hidden");
+        /*document.getElementById("progressbox").classList.remove("hidden");*/
         document.getElementById("ImgDataState").classList.remove("hidden");
         
         // Draw progress bar        
@@ -310,7 +323,7 @@ function ShowImpProgress() {
         document.getElementById("saveprj").classList.remove("hidden");
         document.getElementById("savepng").classList.remove("hidden");        
         
-        document.getElementById("progressbox").classList.add("hidden");
+        /*document.getElementById("progressbox").classList.add("hidden");*/
         document.getElementById("ImgDataState").classList.add("hidden");
         
         generateImgListEditor();

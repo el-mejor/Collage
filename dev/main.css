@@ -1,17 +1,41 @@
+:root {
+    --bg-color: #242424;
+    --txt-color: #cccccc;
+    --box-bg-color: #242424;
+    --header-bg-color: #363636;
+    --title-bg-color: #242424;
+    
+    --primary-color: #03dac6;
+    --secondary-color: #3750c3;
+    --txt-inp-color: #aaaaaa;
+    --inp-bg-color: #363636;
+    --txt-button-color: #dddddd;
+}
 
 * {
 	font-family: 	sans-serif;											
-    font-size:		12px;
+    font-size:		12px;    
 }
 
 body {	
-	background:     dimgray;	
+	background:     var(--bg-color);	
     margin:         0;
-    
+    color:          var(--txt-color);
 }
 
 .hidden {
     display:        none !important;
+}
+
+div.box {               
+    border: 0;    
+    margin:         4px;
+    background:     var(--box-bg-color);
+    padding:        10px;    
+    border-radius:  0px;        
+    /*-webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);*/
 }
 
 div.exportBox {    
@@ -41,50 +65,81 @@ div.centerdiv {
 
 div.header {    
     display:        flex;
-    min-height:     64px;        
+    min-height:     128px;        
     justify-content: space-between;
     align-items:    flex-start;    
     top: 0;
     margin:         0px !important;
     margin-bottom:  4px !important;
-    background:     white !important;    
+    background:     var(--header-bg-color) !important;    
     position: -webkit-sticky; /* Safari */
     position: sticky;    
      
-    -webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    /*-webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
     -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
-    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);*/
 }
 
-div.projectbox {    
-    border: 0;
-    border: 2px solid red !important;
-    background:     gold !important;
-    max-width:      30vw;
+div.projectbox {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    border:         2px solid var(--primary-color);
+    border-radius:  24px;
+    padding-left:   24px;
+    padding-right:   24px;
+    background:     var(--box-bg-color) !important;
+    max-width:      20vw;
     float:          right;
     margin:         10px !important;        
+    max-height:     3em;
+    overflow:       hidden;
+    transition: 3.75s ease-out;
+    
+    /*-webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);*/
 }
 
-div.projectbox a, button {    
+div.projectbox:hover {
+    max-height:     100% !important;
+}
+
+div.projectbox a, button, div.exportBox a {    
+    text-transform: uppercase;
     text-align: center;
     margin: 2px;
-    color:  black;
+    color:  var(--txt-button-color) !important;
     border: 0;
     outline: none;
-    border: 1px solid gray;
-    border-radius: 4px;
-    padding: 2px;
-    background: rgb(255,255,255);
-    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(190,190,190,1) 100%);
-    text-decoration: none;
+    border: 2px solid var(--primary-color);
+    border-radius: 100px;
+    padding: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    /*background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(190,190,190,1) 100%);*/
+    background: var(--inp-bg-color);
+    text-decoration: none;    
+}
+
+div.exportBox a {
+    min-width: 120px !important;
 }
 
 div.projectbox a {
     display: block;
 }
 
-div.projectbox a:active, button:active {    
-    background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(190,190,190,1) 100%) !important;
+div.projectbox a:active, button:active, div.exportBox a:active {        
+    /*border: 2px solid var(--secondary-color);*/
+    /*background: var(--secondary-color) !important;
+    color:  var(--txt-button-color) !important;*/
+}
+
+div.projectbox a:hover, button:hover, div.exportBox a:hover {        
+    background: var(--primary-color);
+    color: #000000 !important;
 }
 
 div.workspace {
@@ -101,7 +156,8 @@ div.title {
     display:        flex;
     min-height:     64px;    
     align-items:    center;
-    margin:         auto;        
+    margin:         auto;
+    margin-left:    30px;
 }
 
 span.title {    
@@ -109,21 +165,15 @@ span.title {
     font-weight:    bold;    
 }
 
-div.box {               
-    border: 0;    
-    margin:         4px;
-    background:     whitesmoke;
-    padding:        10px;    
-    border-radius:  4px;        
-    -webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
-    -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
-    box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
+span.dataInfo {
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
 
 div.svgbox {
     margin:         10px;
-    background:     #AAAAAA;
+    background:     var(--txt-inp-color);
     padding:        0;    
     border:         1px solid black;
     border-radius:  0;    
@@ -132,51 +182,92 @@ div.svgbox {
 
 div.dropzone {
     min-height:     100px;
-    border:         1px dotted dimgray;
-    border-radius:  5px;
-    padding:        10px;
+    border:         2px solid var(--primary-color);
+    border-radius:  24px;
+    padding:        24px;
     margin:         10px;
 }
 
 h2 {
+    text-transform: uppercase;
+    border: 0;
+    /*border-left: 2px solid var(--primary-color);
+    border-right: 2px solid var(--primary-color);*/
     margin:         0px;
     margin-bottom:  10px;    
     font-size:      1.3em;
-    border-bottom:  1px solid dimgray;
+    /*border-bottom:  1px solid #242424;*/
+    background:     var(--title-bg-color);
+    padding:        10px;
+    padding-left:   0;
+    color:          var(--primary-color);
 }
 
-table {
-    border-spacing:		0;
+a {
+    color: #ffffff;
 }
 
-tr {
+table {      
+    border-spacing: 0 4px;    
+}
+
+tr {    
     transition: all .5s ease-out;
-	-webkit-transition: all .5s ease-out;
+	-webkit-transition: all .5s ease-out;        
 }
 
 tr.rowSelected {
-    background-color:     lightgreen !important;
+    background-color:     var(--secondary-color) !important;
 }
 
 tr.enHover:hover {
-    background-color:     lightgreen !important;
+    background-color:     var(--secondary-color) !important;
 }
 
-td {
+td.imgOK {        
+    border: 0;
+    border-left: 3px solid limegreen;    
+    padding-left: 10px !important;
+}
+
+td.imgSpare {        
+    border: 0;
+    border-left: 3px solid #888888;
+    padding-left: 10px !important;
+}
+
+td.imgNOK {
+    border: 0;
+    border-left: 3px solid red;
+    padding-left: 10px !important;
+}
+
+td.imgPrc {
+    border: 0;
+    border-left: 3px solid magenta;
+    padding-left: 10px !important;
+}
+
+td {    
     margin:         0px;
     padding-left:   5px;
-    padding-right:   5px;    
-    border-bottom:  1px dotted lightgray;
+    padding-right:   5px;            
 }
 
-input, select {
+input, select {    
     margin-left:    5px;
     margin-right:   5px;    
 }
 
+select {
+    text-transform: uppercase;
+}
+
 input[type="number"],input[type="text"],select {   
     border: 0;
-    border: 1px solid lightgray;
+    border: 2px solid var(--secondary-color);
+    background: var(--inp-bg-color);
+    color:  var(--txt-inp-color);
     border-radius: 4px;
     padding: 2px;
     outline: none;    
@@ -188,7 +279,7 @@ input[type="number"] {
 }
 
 input[type="number"]:focus,input[type="text"]:focus,select:focus {    
-    border: 1px solid black !important;
+    border: 2px solid var(--primary-color) !important;
 }
 
 input.smallField {
@@ -196,12 +287,12 @@ input.smallField {
 }
 
 input.largeField {
-    width:          200px;
+    width:          150px;
 }
 
 button.editorbutton {
-    width:          30px;
-    height:         20px;
+    width:          40px;
+    /*height:         20px;*/
 }
 
 button.editorbutton span {
