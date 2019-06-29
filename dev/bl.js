@@ -42,8 +42,8 @@ function initUI() {
     obj = document.getElementsByClassName("paramField");
     for (let i = 0; i < obj.length; i++)
     {        
-        obj[i].addEventListener("keyup", generate);			
-        obj[i].addEventListener("mouseup", generate);		
+        obj[i].addEventListener("keyup", generateImgListEditor);			
+        obj[i].addEventListener("mouseup", generateImgListEditor);		
     }
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);        
@@ -59,7 +59,9 @@ function initUI() {
 }
 
 /* build the image list editor */
-function generateImgListEditor() {
+function generateImgListEditor() {    
+    generate();
+    
     document.getElementById("dropzone").innerHTML = "<table id='imagelisteditor'></table>";
     for (let i = 0; i < Images.length; i++) {
         let rClass = "";      
@@ -69,12 +71,20 @@ function generateImgListEditor() {
             fClass = "imgOK";
             if (Images[i].FileName == "frei") {
                 fClass = "imgSpare";
-            }
+            } 
+            else if (Images[i].width < (collageWidth / columns)) {
+                fClass = "imgBadQual";                             
+            } /*else if (Images[i].height < (collageHeight / maxrows)) {
+                fClass = "imgBadQual";  
+            }*/
         } else if (Images[i].Error) {
             fClass = "imgNOK";
-        } else {
+        } 
+        
+        if (Images[i].FullImgProcessing) {
             fClass = "imgPrc";
-        }
+        }       
+        
         
         if (i == Selection) {
             rClass = "rowSelected";
@@ -104,7 +114,7 @@ function generateImgListEditor() {
         
     }
     
-    generate();
+    
 }
 
 /* start generating svg */
@@ -359,7 +369,7 @@ function dropImages(e) {
 /* generate image preview and callback generator */
 function setImgPreview(cImg, res) {
     if (cImg.File) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
+        resize_file(cImg.File, res, function (resizedDataUrl, width, height) { 
             cImg.Preview = resizedDataUrl; 
             cImg.Processing = false; 
             if (resizedDataUrl == "ERR") {
@@ -375,8 +385,10 @@ function setImgPreview(cImg, res) {
 /* generate full images for export and callback exporter */
 function setFullImageData(cImg, res) {
     if (cImg.File && cImg.Visible) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
+        resize_file(cImg.File, res, function (resizedDataUrl, width, height) { 
             cImg.FullImg = resizedDataUrl; 
+            cImg.width = width;
+            cImg.height = width;
             cImg.FullImgProcessing = false; 
             if (resizedDataUrl == "ERR") {
                 cImg.Error = true;
@@ -605,6 +617,8 @@ function makeJSONObj() {
         iObj ["FileName"] = Images[i].FileName;
         iObj ["Preview"] = Images[i].Preview;
         iObj ["FullImg"] = Images[i].FullImg;
+        iObj ["width"] = Images[i].width;
+        iObj ["height"] = Images[i].height;
         iObj ["SubTitle"] = Images[i].SubTitle;
         iObj ["Visible"] = Images[i].Visible;
         iObj ["XSpan"] = Images[i].XSpan;
@@ -661,6 +675,8 @@ function interpretPrj(str) {
         Images.push(new CollageImage(null, jsonObj[i].FileName, jsonObj[i].SubTitle, jsonObj[i].Visible));
         Images[i-1].Preview = jsonObj[i].Preview;
         Images[i-1].FullImg = jsonObj[i].FullImg;        
+        Images[i-1].width = jsonObj[i].width; 
+        Images[i-1].height = jsonObj[i].height;
         Images[i-1].XSpan = jsonObj[i].XSpan;
         Images[i-1].YSpan = jsonObj[i].YSpan;
         Images[i-1].Error = jsonObj[i].Error;
@@ -693,6 +709,8 @@ class CollageImage {
         this.Processing = visible;
         this.Error = false;
         this.FullImg;
+        this.width;
+        this.height;
         this.FullImgProcessing = visible;
     }
 }

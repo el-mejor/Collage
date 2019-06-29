@@ -95,14 +95,14 @@ div.projectbox {
     max-height:     3em;
     overflow:       hidden;
     transition: 3.75s ease-out;
-    
+    min-width:      250px;
     /*-webkit-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
     -moz-box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);
     box-shadow: 5px 5px 10px -5px rgba(0,0,0,1);*/
 }
 
 div.projectbox:hover {
-    max-height:     100% !important;
+    max-height:     100% !important;    
 }
 
 div.projectbox a, button, div.exportBox a {    
@@ -174,10 +174,11 @@ span.dataInfo {
 div.svgbox {
     margin:         10px;
     background:     var(--txt-inp-color);
-    padding:        0;    
+    padding:        10px;    
     border:         1px solid black;
     border-radius:  0;    
     align-content:  center;
+    max-width:      45vw;
 }
 
 div.dropzone {
@@ -245,6 +246,12 @@ td.imgNOK {
 td.imgPrc {
     border: 0;
     border-left: 3px solid magenta;
+    padding-left: 10px !important;
+}
+
+td.imgBadQual {
+    border: 0;
+    border-left: 3px solid orange;
     padding-left: 10px !important;
 }
 
