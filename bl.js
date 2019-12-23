@@ -42,8 +42,8 @@ function initUI() {
     obj = document.getElementsByClassName("paramField");
     for (let i = 0; i < obj.length; i++)
     {        
-        obj[i].addEventListener("keyup", generate);			
-        obj[i].addEventListener("mouseup", generate);		
+        obj[i].addEventListener("keyup", generateImgListEditor);			
+        obj[i].addEventListener("mouseup", generateImgListEditor);		
     }
     
     document.getElementById("collagePrjFile").addEventListener("change", loadPrj);        
@@ -59,27 +59,50 @@ function initUI() {
 }
 
 /* build the image list editor */
-function generateImgListEditor() {
+function generateImgListEditor() {    
+    generate();
+    
     document.getElementById("dropzone").innerHTML = "<table id='imagelisteditor'></table>";
     for (let i = 0; i < Images.length; i++) {
-        let rClass = "";
+        let rClass = "";      
+        let fClass = "";
+        
+        if (!Images[i].Processing && !Images[i].Error) {
+            fClass = "imgOK";
+            if (Images[i].FileName == "frei") {
+                fClass = "imgSpare";
+            } 
+            else if (Images[i].width < (collageWidth / columns)) {
+                fClass = "imgBadQual";                             
+            } /*else if (Images[i].height < (collageHeight / maxrows)) {
+                fClass = "imgBadQual";  
+            }*/
+        } else if (Images[i].Error) {
+            fClass = "imgNOK";
+        } 
+        
+        if (Images[i].FullImgProcessing) {
+            fClass = "imgPrc";
+        }       
+        
+        
         if (i == Selection) {
             rClass = "rowSelected";
-        }
-        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + " enHover' id='editorRow" + i + "'><td>" + (i + 1) +  ".</td>";
-        html += "<td><b style='color:green;'>" + Images[i].FileName + "</b></td>";
+        }        
+        let html = "<tr onClick=\"selImage('" + i + "', this)\" class='" + rClass + "  enHover' id='editorRow" + i + "'><td class='" + fClass + "'>" + (i + 1) +  ".</td>";
+        html += "<td>" + Images[i].FileName + "</td>";
 		if (!Images[i].Processing && !Images[i].Error) {
             if (Images[i].Visible) {
-                html += "<td>Untertitel: <input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "'> </td>";
+                html += "<td><input class='largeField' type='text' id='subtitle" + i + "' onKeyUp=\"changeSubTitle('" + i + "', this)\" value='" + Images[i].SubTitle + "' placeholder='Untertitel'> </td>";
                 html += "<td>Breite: <input class='smallField' type='number' id='xspan" + i + "' onClick=\"xSpanImage('" + i + "', this)\" value='" + Images[i].XSpan + "'></td>";  
                 html += "<td>Höhe: <input class='smallField' type='number' id='yspan" + i + "' onClick=\"ySpanImage('" + i + "', this)\" value='" + Images[i].YSpan + "'></td>";  
             } else  {
                 html += "<td></td><td></td><td></td>";
             }
         } else if (Images[i].Error) {
-            html += "<td style='color:red;font-weight:bold;'>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
+            html += "<td>Vorschau nicht möglich. Kein Bild?</td><td></td><td></td>";        
         } else {
-            html += "<td style='color:orange;font-weight:bold;'>Erzeuge Vorschau ...</td><td></td><td></td>";
+            html += "<td>Importiere Bild ...</td><td></td><td></td>";
         }
 
         html += "<td><button type='button' class='editorbutton up' id='up" + i + "' onClick=\"upImage('" + i + "')\" ><span></span></button>";  
@@ -91,7 +114,7 @@ function generateImgListEditor() {
         
     }
     
-    generate();
+    
 }
 
 /* start generating svg */
@@ -203,7 +226,7 @@ function svgGenerator(preview, imgCollection, fullRes) {
                     ret += "<image xlink:href='" + iFile + "' x='" + eX + "px' y='" + eY + "' width='" + eW + "px' height='" + eH + "px' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ") scale(" + ImgScale + ")' preserveAspectRatio='xMidYMid slice' " + cHandler + "/>";
                     
                     if (eSth > 0) {
-                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + (eSth * 0.8)) + "px' alignment-baseline='middle' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan x='0' text-anchor='middle' style='fill:" + TextColor + ";font-weight:bold;font-family:Arial,Verdana,sans-serif;font-size:" + (eSth * 0.8) + "'>" + imgCollection[iimg].SubTitle + "</tspan></text>"; 
+                        ret += "<text x='" + (eX + 5) + "px' y='" + (eY + eH + (eSth * 0.8)) + "px' alignment-baseline='middle' transform='translate(" + eTransX +  " " + eTransY + ") rotate(" + eRot + ")'><tspan x='0' text-anchor='middle' style='fill:" + TextColor + ";font-family:Arial,Verdana,sans-serif;font-size:" + (eSth * 0.8) + "'>" + imgCollection[iimg].SubTitle + "</tspan></text>"; 
                     }
                 }
                 
@@ -290,7 +313,7 @@ function ShowImpProgress() {
         document.getElementById("saveprj").classList.add("hidden");
         document.getElementById("savepng").classList.add("hidden");      
         
-        document.getElementById("progressbox").classList.remove("hidden");
+        /*document.getElementById("progressbox").classList.remove("hidden");*/
         document.getElementById("ImgDataState").classList.remove("hidden");
         
         // Draw progress bar        
@@ -310,7 +333,7 @@ function ShowImpProgress() {
         document.getElementById("saveprj").classList.remove("hidden");
         document.getElementById("savepng").classList.remove("hidden");        
         
-        document.getElementById("progressbox").classList.add("hidden");
+        /*document.getElementById("progressbox").classList.add("hidden");*/
         document.getElementById("ImgDataState").classList.add("hidden");
         
         generateImgListEditor();
@@ -346,7 +369,7 @@ function dropImages(e) {
 /* generate image preview and callback generator */
 function setImgPreview(cImg, res) {
     if (cImg.File) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
+        resize_file(cImg.File, res, function (resizedDataUrl, width, height) { 
             cImg.Preview = resizedDataUrl; 
             cImg.Processing = false; 
             if (resizedDataUrl == "ERR") {
@@ -362,8 +385,10 @@ function setImgPreview(cImg, res) {
 /* generate full images for export and callback exporter */
 function setFullImageData(cImg, res) {
     if (cImg.File && cImg.Visible) {
-        resize_file(cImg.File, res, function (resizedDataUrl) { 
+        resize_file(cImg.File, res, function (resizedDataUrl, width, height) { 
             cImg.FullImg = resizedDataUrl; 
+            cImg.width = width;
+            cImg.height = width;
             cImg.FullImgProcessing = false; 
             if (resizedDataUrl == "ERR") {
                 cImg.Error = true;
@@ -592,6 +617,8 @@ function makeJSONObj() {
         iObj ["FileName"] = Images[i].FileName;
         iObj ["Preview"] = Images[i].Preview;
         iObj ["FullImg"] = Images[i].FullImg;
+        iObj ["width"] = Images[i].width;
+        iObj ["height"] = Images[i].height;
         iObj ["SubTitle"] = Images[i].SubTitle;
         iObj ["Visible"] = Images[i].Visible;
         iObj ["XSpan"] = Images[i].XSpan;
@@ -648,6 +675,8 @@ function interpretPrj(str) {
         Images.push(new CollageImage(null, jsonObj[i].FileName, jsonObj[i].SubTitle, jsonObj[i].Visible));
         Images[i-1].Preview = jsonObj[i].Preview;
         Images[i-1].FullImg = jsonObj[i].FullImg;        
+        Images[i-1].width = jsonObj[i].width; 
+        Images[i-1].height = jsonObj[i].height;
         Images[i-1].XSpan = jsonObj[i].XSpan;
         Images[i-1].YSpan = jsonObj[i].YSpan;
         Images[i-1].Error = jsonObj[i].Error;
@@ -680,6 +709,8 @@ class CollageImage {
         this.Processing = visible;
         this.Error = false;
         this.FullImg;
+        this.width;
+        this.height;
         this.FullImgProcessing = visible;
     }
 }

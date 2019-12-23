@@ -44,10 +44,10 @@ function resize_dataUrl(dataURL, maxSize, callback){
         // Draw resized image in canvas
         canvas.width = width;
         canvas.height = height;
-        canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-
+        canvas.getContext('2d').drawImage(image, 0, 0, width, height);        
+        
         // And read the resized image from the canvas (return data to callback function as param)
-        callback(canvas.toDataURL('image/jpeg', 1));
+        callback(canvas.toDataURL('image/jpeg', 1), width, height);
     }
     image.src = dataURL;
 }
